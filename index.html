@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Disco &amp; Dragons — Редактор Анкет</title>
+<meta name="description" content="Редактор анкет персонажей D&amp;D с формулами, заметками и экспортом в PDF. Работает целиком в браузере.">
+<link rel="icon" href="assets/DnDSheetGenerator32.png" sizes="32x32">
+<link rel="icon" href="assets/DnDSheetGenerator16.png" sizes="16x16">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/canvas.css">
+<link rel="stylesheet" href="css/note-editor.css">
+</head>
+<body>
+
+<div id="app">
+
+  <div id="menubar">
+    <div class="menu" data-menu="file">
+      <button type="button" aria-haspopup="true" aria-expanded="false">Файл</button>
+      <div class="menu-popup" role="menu">
+        <button type="button" data-act="new"><img alt="" data-icon="page_main">Новая анкета</button>
+        <button type="button" data-act="open"><img alt="" data-icon="folder_open">Открыть анкету…</button>
+        <div class="submenu" data-menu="recent">
+          <button type="button" aria-haspopup="true"><img alt="" data-icon="folder_open">Недавние<span class="shortcut">›</span></button>
+          <div class="menu-popup" id="recent-popup" role="menu"></div>
+        </div>
+        <div class="menu-sep"></div>
+        <button type="button" data-act="save"><img alt="" data-icon="save">Сохранить<span class="shortcut">Ctrl+S</span></button>
+        <button type="button" data-act="save-as"><img alt="" data-icon="save">Сохранить как…<span class="shortcut">Ctrl+Shift+S</span></button>
+        <button type="button" data-act="export-pdf"><img alt="" data-icon="export">Экспорт в PDF…</button>
+        <div class="menu-sep"></div>
+        <button type="button" data-act="change-bg"><img alt="" data-icon="image">Сменить фон…</button>
+        <button type="button" data-act="reset-bg"><img alt="" data-icon="arrow_circular">Сбросить к стандартному фону</button>
+        <div class="menu-sep"></div>
+        <button type="button" data-act="settings"><img alt="" data-icon="gear">Настройки…</button>
+      </div>
+    </div>
+
+    <div class="menu" data-menu="edit">
+      <button type="button" aria-haspopup="true" aria-expanded="false">Правка</button>
+      <div class="menu-popup" role="menu">
+        <button type="button" data-act="rename"><img alt="" data-icon="edit">Переименовать анкету…</button>
+      </div>
+    </div>
+
+    <div class="menu" data-menu="view">
+      <button type="button" aria-haspopup="true" aria-expanded="false">Вид</button>
+      <div class="menu-popup" role="menu">
+        <button type="button" data-act="zoom-in"><img alt="" data-icon="zoom_in">Увеличить<span class="shortcut">Ctrl++</span></button>
+        <button type="button" data-act="zoom-out"><img alt="" data-icon="zoom_out">Уменьшить<span class="shortcut">Ctrl+−</span></button>
+        <button type="button" data-act="zoom-fit"><img alt="" data-icon="zoom">Вписать в окно<span class="shortcut">Ctrl+0</span></button>
+      </div>
+    </div>
+
+    <div class="menu" data-menu="help">
+      <button type="button" aria-haspopup="true" aria-expanded="false">Справка</button>
+      <div class="menu-popup" role="menu">
+        <button type="button" data-act="about">О программе</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pagebar">
+    <div id="page-indicator"></div>
+  </div>
+
+  <div id="main">
+    <div id="center">
+      <div class="view" id="canvas-view">
+        <div id="stage">
+          <div id="page">
+            <canvas id="page-bg" width="1" height="1"></canvas>
+            <img id="page-bg-img" alt="" hidden>
+            <div id="field-layer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="view" id="note-view" hidden></div>
+
+      <div id="zoom-bar">
+        <button type="button" class="btn-icon" data-act="zoom-out" title="Уменьшить"><img alt="" data-icon="zoom_out"></button>
+        <span class="level" id="zoom-level">100%</span>
+        <button type="button" class="btn-icon" data-act="zoom-in" title="Увеличить"><img alt="" data-icon="zoom_in"></button>
+        <button type="button" class="btn-icon" data-act="zoom-fit" title="Вписать в окно"><img alt="" data-icon="zoom"></button>
+      </div>
+    </div>
+
+    <aside id="sidebar">
+      <div class="panel-header">
+        <img alt="" data-icon="die">
+        <span class="title">Параметры</span>
+      </div>
+      <div class="panel-body" id="hidden-panel"></div>
+    </aside>
+  </div>
+
+  <div id="statusbar">
+    <span id="status-msg">Готово</span>
+    <span id="field-count">Полей: 0</span>
+    <span id="mode-status">[ Заполнение ]</span>
+  </div>
+
+</div>
+
+<div id="busy" hidden>
+  <div class="box">
+    <div class="spinner"></div>
+    <div class="label" id="busy-label">Минутку…</div>
+  </div>
+</div>
+
+<div id="drop-hint" hidden>Отпустите файл, чтобы открыть анкету</div>
+
+<!--
+  pdf-lib and fontkit ship as UMD bundles, so they are loaded as classic
+  scripts and picked up from globalThis. pdf.js is an ES module and is
+  imported on demand by ui/pdf-render.js.
+-->
+<script src="js/vendor/pdf-lib.min.js"></script>
+<script src="js/vendor/fontkit.umd.min.js"></script>
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>

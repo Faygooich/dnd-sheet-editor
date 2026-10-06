@@ -1,0 +1,12 @@
+/*
+ * Note-page editor styles.
+ *
+ * The pencil/eraser/text canvas arrives with the note editor itself; this
+ * file is referenced by index.html from the start so the stylesheet list
+ * never changes shape.
+ */
+
+#note-view {
+  overflow: auto;
+  background: var(--canvas-backdrop);
+}

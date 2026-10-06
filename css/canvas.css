@@ -1,0 +1,321 @@
+/*
+ * The A4 sheet stage and the fill-mode field widgets.
+ *
+ * The page element is exactly 595.276 x 841.890 CSS px, so 1 px = 1 PDF point
+ * at zoom 1 and every field can be positioned with its raw model geometry.
+ * Zoom is a transform on the page, never a change of these numbers.
+ */
+
+#canvas-view {
+  overflow: auto;
+  background: var(--canvas-backdrop);
+}
+
+/* Sized in JS to page * zoom, so the scroll area matches the zoomed page. */
+#stage {
+  position: relative;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#page {
+  position: relative;
+  width: 595.276px;
+  height: 841.89px;
+  transform-origin: 0 0;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+
+/* pdf.js renders the background here; a raster background uses the <img>. */
+#page-bg,
+#page-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+#page-bg-img { object-fit: fill; }
+
+#field-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Fields ────────────────────────────────────────────────────────────── */
+
+/*
+ * Every control inherits the sheet font with OpenType features disabled.
+ * fontkit/pdf-lib shape the exported PDF with calt/liga/kern off to match
+ * ReportLab, so the screen has to do the same or the two would disagree.
+ */
+.field {
+  position: absolute;
+  font-family: var(--sheet-font);
+  font-feature-settings: "calt" 0, "clig" 0, "liga" 0, "kern" 0;
+  font-variant-ligatures: none;
+  font-kerning: none;
+}
+
+.field > .control {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-feature-settings: inherit;
+  border-radius: 0;
+  min-height: 0;
+  padding: 0 3px;            /* matches the exporter's 3pt side padding */
+  box-shadow: none;
+  outline: none;
+}
+
+.field > .control:focus {
+  background: rgba(186, 79, 194, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(220, 116, 210, 0.55);
+}
+
+.field input.control,
+.field div.control {
+  line-height: normal;
+}
+
+.field textarea.control {
+  resize: none;
+  overflow: hidden;
+  display: block;
+}
+
+/* Read-only formula output. */
+.field .control.readonly {
+  display: flex;
+  overflow: hidden;
+  cursor: default;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Vertical alignment, matching the exporter's valign. */
+.field[data-valign="top"] .control.readonly { align-items: flex-start; }
+.field[data-valign="center"] .control.readonly { align-items: center; }
+.field[data-valign="bottom"] .control.readonly { align-items: flex-end; }
+
+.field[data-valign="top"] input.control { align-self: flex-start; }
+
+/* A single-line input has to be vertically centred by the flex parent. */
+.field.single-line {
+  display: flex;
+}
+.field.single-line[data-valign="top"] { align-items: flex-start; }
+.field.single-line[data-valign="center"] { align-items: center; }
+.field.single-line[data-valign="bottom"] { align-items: flex-end; }
+.field.single-line > input.control { height: auto; }
+
+/* ── Photo fields ──────────────────────────────────────────────────────── */
+
+.field.photo {
+  overflow: hidden;
+  background: #0E080E;
+}
+
+.field.photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  mix-blend-mode: multiply;    /* the "aged photo on parchment" look */
+}
+.field.photo img[data-fit="cover"] { object-fit: cover; }
+.field.photo img[data-fit="contain"] { object-fit: contain; }
+.field.photo img[data-fit="stretch"] { object-fit: fill; }
+
+.field.photo.clickable { cursor: pointer; }
+.field.photo.clickable:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+
+.field.photo .photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #4A1A48;
+  pointer-events: none;
+}
+.field.photo .photo-placeholder svg { width: 32%; height: 32%; }
+
+/* ── Hidden fields drawn on the page itself ────────────────────────────── */
+
+.field.hidden-field {
+  display: flex;
+  align-items: flex-start;
+  background: transparent;
+}
+.field.hidden-field input[type="number"] {
+  width: 100%;
+  height: 20px;
+  min-height: 0;
+  padding: 0 2px;
+  font-size: 9px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #6060c0;
+  font-family: var(--ui-font);
+  -moz-appearance: textfield;
+}
+.field.hidden-field input[type="number"]::-webkit-outer-spin-button,
+.field.hidden-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.field.hidden-field input[type="checkbox"] {
+  width: 10px;
+  height: 10px;
+  margin: 2px;
+  accent-color: #6060c0;
+}
+
+/* ── Stats field ───────────────────────────────────────────────────────── */
+
+.field.stats .control {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.field.stats .control:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.field.stats .control.unset { color: var(--placeholder); }
+
+/*
+ * The stats popup is deliberately a white index card rather than the app's
+ * magenta chrome — Act 3 styles this menu black-on-white on purpose.
+ */
+.stats-menu {
+  position: fixed;
+  z-index: 150;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 2px;
+  padding: 2px;
+  min-width: 190px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+  font-family: var(--sheet-font);
+}
+.stats-menu button {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  padding: 5px 10px;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  color: #000;
+  font: 13px var(--sheet-font);
+  text-align: left;
+}
+.stats-menu button:hover { background: #000; color: #fff; border-color: transparent; }
+.stats-menu button .linked { margin-left: auto; opacity: 0.65; }
+.stats-menu button.checked::before { content: "✓ "; font-weight: 700; }
+
+/* ── Ability field ─────────────────────────────────────────────────────── */
+
+.field.ability {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.field.ability .blocks {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ability-block { position: relative; }
+
+.ability-block .bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+}
+.ability-block:hover .bar,
+.ability-block:focus-within .bar { opacity: 1; }
+
+.ability-block .bar button {
+  min-height: 0;
+  height: 16px;
+  padding: 0 6px;
+  font-size: 9px;
+  font-family: var(--ui-font);
+  background: #1A0A1C;
+  border: 1px solid var(--hairline);
+  color: var(--text-2);
+  border-radius: 3px;
+}
+.ability-block .bar button:hover { border-color: var(--accent); }
+.ability-block .bar .del { margin-left: auto; color: var(--danger); }
+
+.ability-block textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  min-height: 0;
+  resize: none;
+  overflow: hidden;
+  font-family: inherit;
+  font-feature-settings: inherit;
+}
+.ability-block textarea:focus { box-shadow: none; background: rgba(186, 79, 194, 0.08); }
+
+.field.ability .add-block {
+  flex: none;
+  min-height: 0;
+  height: 18px;
+  margin: 2px 3px 3px;
+  padding: 0;
+  font-size: 10px;
+  font-family: var(--ui-font);
+  background: rgba(186, 79, 194, 0.12);
+  border: 1px solid var(--hairline);
+  color: var(--accent);
+  border-radius: 3px;
+}
+.field.ability .add-block:hover { border-color: var(--accent); }
+
+/* ── Zoom controls ─────────────────────────────────────────────────────── */
+
+#zoom-bar {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(13, 8, 15, 0.9);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+#zoom-bar .level {
+  min-width: 46px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}

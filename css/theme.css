@@ -1,0 +1,236 @@
+/*
+ * Dark rose-magenta theme, ported from Act 3's ui/styles.py QSS.
+ * Palette: #BA4FC2 #DC74D2 #FEC1FC #F5A0F1 #FEE1FF
+ */
+
+:root {
+  /* Surfaces */
+  --bg: #100B12;
+  --chrome: #0D080F;
+  --panel: #130B14;
+  --pane: #150A16;
+  --input: #1C0E1C;
+  --input-focus: #201020;
+  --row-hover: #1A0A1A;
+  --canvas-backdrop: #08060A;
+
+  /* Lines */
+  --hairline: #2A1028;
+  --outline: #4A1A48;
+
+  /* Accents */
+  --active: #8A2A98;
+  --accent: #BA4FC2;
+  --accent-bright: #DC74D2;
+  --accent-deep: #9A35AA;
+
+  /* Text */
+  --text: #FEE1FF;
+  --text-2: #F5A0F1;
+  --text-3: #FEC1FC;
+  --text-dim: #C060C0;
+  --text-muted: #702878;
+  --text-disabled: #80409A;
+  --placeholder: #5A285A;
+
+  /* Semantic */
+  --danger: #D06080;
+  --danger-border: #6B2040;
+  --danger-hover: #FF8080;
+  --ok: #7db870;
+  --err: #d06060;
+  --guide: #00dcff;
+
+  /* Field-type accents, mirrored from styles.py TYPE_COLORS */
+  --t-text: #BA4FC2;
+  --t-number: #06b6d4;
+  --t-formula: #DC74D2;
+  --t-photo-user: #0891b2;
+  --t-photo-static: #9A35AA;
+  --t-hidden-number: #f59e0b;
+  --t-hidden-bool: #d97706;
+  --t-stats: #10b981;
+  --t-ability: #e11d48;
+
+  /* Shape */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+
+  /* Motion — Act 3's Motion.FAST / BASE / SLOW with OutCubic / InOutCubic */
+  --t-fast: 150ms;
+  --t-base: 220ms;
+  --t-slow: 320ms;
+  --ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-inout: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  /* Chrome font. The sheet itself uses Segoe Script — see canvas.css. */
+  --ui-font: "Segoe UI", system-ui, -apple-system, "Noto Sans", sans-serif;
+  --sheet-font: "Segoe Script", "Segoe UI", sans-serif;
+
+  color-scheme: dark;
+}
+
+/*
+ * The sheet font, bundled so it renders the same on every machine.
+ * Segoe Script ships regular + bold as two files.
+ */
+@font-face {
+  font-family: "Segoe Script";
+  src: url("../assets/fonts/segoesc.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Segoe Script";
+  src: url("../assets/fonts/segoescb.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 var(--ui-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Scrollbars: 8px flat pills, no arrow buttons ──────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline) transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--outline);
+  border-radius: var(--r-sm);
+}
+::-webkit-scrollbar-thumb:hover { background: #9A35AA; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+
+button {
+  font: 13px var(--ui-font);
+  color: var(--text);
+  background: var(--input);
+  border: 1px solid var(--outline);
+  border-radius: var(--r-md);
+  padding: 7px 18px;
+  min-height: 30px;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+button:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+  opacity: 0.65;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 1px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  color: var(--danger-hover);
+  border-color: var(--danger);
+}
+
+/* Square icon-only button */
+.btn-icon {
+  padding: 0;
+  min-height: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-color: transparent;
+  background: transparent;
+}
+.btn-icon:hover:not(:disabled) { background: #3A1A3A; border-color: transparent; }
+.btn-icon img { width: 16px; height: 16px; display: block; }
+
+/* ── Inputs ────────────────────────────────────────────────────────────── */
+
+input, textarea, select {
+  font: 13px var(--ui-font);
+  color: var(--text);
+  background: var(--input);
+  border: 1px solid var(--outline);
+  border-radius: var(--r-md);
+  padding: 5px 9px;
+  min-height: 28px;
+}
+
+input:focus, textarea:focus, select:focus {
+  background: var(--input-focus);
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(186, 79, 194, 0.18);
+}
+
+input::placeholder, textarea::placeholder { color: var(--placeholder); }
+
+label { color: var(--text-2); }
+
+/* ── Headings / hints ──────────────────────────────────────────────────── */
+
+.heading { font-size: 14px; font-weight: 700; color: var(--text); }
+.subheading { font-size: 11px; color: var(--text-muted); }
+.hint { font-size: 10px; font-style: italic; color: var(--text-muted); }
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
